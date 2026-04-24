@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
   return Response.json(
     {
-      message: 'Registration successful. Check your email to confirm your account.',
+      message: 'Registration successful.',
       user: {
         id: data.user?.id,
         email: data.user?.email,
