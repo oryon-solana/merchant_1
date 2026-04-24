@@ -12,8 +12,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'NusaPoints - Belanja & Kumpulkan Poin',
-  description: 'Platform belanja dengan sistem loyalitas poin universal dari merchant pilihan',
+  title: 'Blacksinyo Coffee — Premium Coffee & Loyalty Rewards',
+  description: 'Specialty coffee crafted with intention. Order online and earn points on every cup.',
   generator: 'v0.app',
   icons: {
     icon: [

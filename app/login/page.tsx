@@ -5,10 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Gift, Mail, Lock, AlertCircle } from 'lucide-react'
+import { AlertCircle, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -22,156 +20,129 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setIsLoading(true)
-
     try {
       await login(email, password)
       router.push('/shop')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Gagal login')
+      setError(err instanceof Error ? err.message : 'Login failed')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 flex items-center justify-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
-      >
-        <Card className="shadow-xl border-slate-200">
-          <CardHeader className="space-y-4 text-center bg-gradient-to-br from-indigo-50 to-blue-50 border-b border-slate-200">
-            <div className="flex justify-center">
-              <div className="bg-indigo-600 text-white p-3 rounded-xl">
-                <Gift className="w-8 h-8" />
+    <div className="min-h-screen flex -mt-20">
+
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-black relative flex-col justify-between p-16 pt-28 overflow-hidden">
+        <motion.img
+          src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1920&q=80"
+          alt="Blacksinyo Coffee"
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
+          initial={{ scale: 1.05 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 8, ease: 'easeOut' }}
+          onError={(e) => { e.currentTarget.style.display = 'none' }}
+        />
+        <div className="relative z-10">
+          <Link href="/" className="text-white text-sm font-black uppercase tracking-widest">
+            Blacksinyo
+          </Link>
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="relative z-10"
+        >
+          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-4">Loyalty Program</p>
+          <h2 className="text-4xl font-black uppercase text-white leading-tight mb-3">
+            EVERY SIP<br />EARNS POINTS
+          </h2>
+          <p className="text-white/40 text-sm">1 poin for every Rp 10 spent.</p>
+        </motion.div>
+      </div>
+
+      {/* Right panel */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-24 bg-white">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-sm"
+        >
+          {/* Mobile logo */}
+          <div className="lg:hidden mb-10">
+            <Link href="/" className="text-black text-sm font-black uppercase tracking-widest">
+              Blacksinyo
+            </Link>
+          </div>
+
+          <p className="text-black/40 text-[10px] uppercase tracking-widest mb-2">Welcome back</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight mb-10">Sign In</h1>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="text-[11px] uppercase tracking-widest text-black/50">Email</label>
+              <Input
+                type="email"
+                placeholder="email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+                className="border-black/20 focus:border-black bg-transparent"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] uppercase tracking-widest text-black/50">Password</label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                className="border-black/20 focus:border-black bg-transparent"
+              />
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 text-red-600 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {error}
               </div>
-            </div>
-            <div>
-              <CardTitle className="text-3xl text-slate-900">NusaPoints</CardTitle>
-              <CardDescription className="text-slate-600 mt-2">
-                Platform Belanja dengan Loyalitas Poin Universal
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email Input */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, duration: 0.4 }}
-                className="space-y-2"
-              >
-                <label htmlFor="email" className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-indigo-600" />
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  className="py-2.5"
-                />
-              </motion.div>
+            )}
 
-              {/* Password Input */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="space-y-2"
-              >
-                <label htmlFor="password" className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-indigo-600" />
-                  Password
-                </label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  className="py-2.5"
-                />
-              </motion.div>
+            <div className="bg-black/4 px-4 py-3 text-xs text-black/40">
+              Demo: <code className="font-mono">budi@example.com</code> / <code className="font-mono">password123</code>
+            </div>
 
-              {/* Error Message */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-3"
-                >
-                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">{error}</span>
-                </motion.div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-black text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isLoading ? 'Signing in...' : (
+                <>Sign In <ArrowRight className="w-3.5 h-3.5" /></>
               )}
+            </button>
+          </form>
 
-              {/* Demo Credentials */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.4 }}
-                className="bg-indigo-50 border border-indigo-200 p-4 rounded-lg"
-              >
-                <p className="font-semibold text-slate-900 mb-2 text-sm">Demo Credentials:</p>
-                <div className="space-y-1 text-sm text-slate-700">
-                  <p>Email: <code className="bg-white px-2 py-0.5 rounded text-xs font-mono">budi@example.com</code></p>
-                  <p>Password: <code className="bg-white px-2 py-0.5 rounded text-xs font-mono">password123</code></p>
-                </div>
-              </motion.div>
-
-              {/* Submit Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.4 }}
-              >
-                <Button
-                  type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 text-base font-semibold"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Sedang login...' : 'Masuk'}
-                </Button>
-              </motion.div>
-            </form>
-
-            {/* Register Link */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.4 }}
-              className="mt-6 text-center text-sm text-slate-600"
-            >
-              Belum punya akun?{' '}
-              <Link href="/register" className="text-indigo-600 hover:text-indigo-700 font-semibold">
-                Daftar sekarang
+          <div className="mt-8 space-y-3 text-center">
+            <p className="text-xs text-black/40">
+              No account?{' '}
+              <Link href="/register" className="text-black font-semibold hover:text-[#0099FF] transition-colors">
+                Register free
               </Link>
-            </motion.div>
-
-            {/* Back to Home */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.4 }}
-              className="mt-3 text-center"
-            >
-              <Link href="/" className="text-xs text-slate-500 hover:text-slate-700">
-                Kembali ke Beranda
-              </Link>
-            </motion.div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </p>
+            <Link href="/" className="block text-[11px] text-black/25 hover:text-black/50 uppercase tracking-widest transition-colors">
+              Back to Home
+            </Link>
+          </div>
+        </motion.div>
+      </div>
     </div>
   )
 }

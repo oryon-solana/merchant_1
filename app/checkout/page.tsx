@@ -7,9 +7,8 @@ import { useRouter } from 'next/navigation'
 import { useCart } from '@/lib/contexts/CartContext'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { usePoints } from '@/lib/contexts/PointsContext'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Lock, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react'
+import { Lock, ArrowLeft, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -25,20 +24,24 @@ export default function CheckoutPage() {
     city: '',
     postalCode: '',
   })
-  const [paymentMethod, setPaymentMethod] = useState<string>('credit-card')
+  const [paymentMethod, setPaymentMethod] = useState('e-wallet')
   const [isProcessing, setIsProcessing] = useState(false)
-  const [orderId, setOrderId] = useState<string>('')
+  const [orderId, setOrderId] = useState('')
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <Lock className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Masuk Diperlukan</h1>
-          <p className="text-slate-600 mb-6">Anda harus masuk untuk menyelesaikan pembelian.</p>
-          <Button asChild className="bg-indigo-600 hover:bg-indigo-700">
-            <Link href="/login">Masuk ke Akun</Link>
-          </Button>
+      <div className="min-h-screen bg-white flex items-center justify-center px-8">
+        <div className="text-center max-w-sm">
+          <Lock className="w-10 h-10 text-black/20 mx-auto mb-6" />
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-2">Access Required</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight mb-4">Sign In First</h1>
+          <p className="text-sm text-black/50 mb-8">You need an account to complete your order.</p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 bg-black text-white px-8 py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors"
+          >
+            Sign In <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
     )
@@ -46,14 +49,17 @@ export default function CheckoutPage() {
 
   if (cartItems.length === 0 && step !== 'success') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Keranjang Kosong</h1>
-          <p className="text-slate-600 mb-6">Belum ada produk di keranjang Anda.</p>
-          <Button asChild className="bg-indigo-600 hover:bg-indigo-700">
-            <Link href="/shop">Kembali ke Toko</Link>
-          </Button>
+      <div className="min-h-screen bg-white flex items-center justify-center px-8">
+        <div className="text-center max-w-sm">
+          <AlertCircle className="w-10 h-10 text-black/20 mx-auto mb-6" />
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-2">Nothing to checkout</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight mb-4">Cart is Empty</h1>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 bg-black text-white px-8 py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors"
+          >
+            Browse Menu <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
     )
@@ -66,23 +72,18 @@ export default function CheckoutPage() {
     }
   }
 
-  const handlePayment = async () => {
+  const handlePayment = () => {
     setIsProcessing(true)
-    
-    // Simulate payment processing
     setTimeout(() => {
-      const newOrderId = `ORD-${Date.now()}`
+      const newOrderId = `BS-${Date.now()}`
       setOrderId(newOrderId)
-
-      // Create transaction record
-      const pointsEarned = getCartPointsEstimate()
       addTransaction({
         id: newOrderId,
         userId: user!.id,
-        merchantId: cartItems[0]?.merchant.id || 'unknown',
-        merchantName: cartItems[0]?.merchant.name || 'Mixed Merchants',
+        merchantId: 'blacksinyo',
+        merchantName: 'Blacksinyo Coffee',
         amount: getCartTotal(),
-        pointsEarned,
+        pointsEarned: getCartPointsEstimate(),
         timestamp: new Date(),
         items: cartItems.map((item) => ({
           productName: item.product.name,
@@ -90,210 +91,186 @@ export default function CheckoutPage() {
           price: item.product.price,
         })),
       })
-
       clearCart()
       setStep('success')
       setIsProcessing(false)
     }, 2000)
   }
 
+  const PAYMENT_METHODS = [
+    { id: 'e-wallet', label: 'E-Wallet', desc: 'GoPay, OVO, DANA' },
+    { id: 'credit-card', label: 'Credit Card', desc: 'Visa, Mastercard' },
+    { id: 'debit-card', label: 'Debit Card', desc: 'Bank debit' },
+    { id: 'transfer', label: 'Bank Transfer', desc: 'Manual transfer' },
+  ]
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <section className="bg-white border-b border-slate-200 py-6 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section className="border-b border-black/8 py-8 px-8 md:px-16">
+        <div className="max-w-350 mx-auto">
           {step !== 'success' && (
             <button
               onClick={() => step === 'payment' ? setStep('form') : router.back()}
-              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-4"
+              className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/40 hover:text-black mb-5 transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
-              {step === 'payment' ? 'Kembali ke Form' : 'Kembali'}
+              <ArrowLeft className="w-3.5 h-3.5" />
+              {step === 'payment' ? 'Back to Details' : 'Back'}
             </button>
           )}
-          <h1 className="text-3xl font-bold text-slate-900">
-            {step === 'success' ? 'Pesanan Berhasil' : 'Checkout'}
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Blacksinyo Coffee</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight">
+            {step === 'success' ? 'Order Confirmed' : 'Checkout'}
           </h1>
         </div>
       </section>
 
-      {/* Checkout Content */}
-      <section className="py-8 px-4">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-12 px-8 md:px-16">
+        <div className="max-w-350 mx-auto">
+
           {step === 'success' ? (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4 }}
-              className="text-center bg-white rounded-lg border border-slate-200 p-12"
+              className="max-w-lg mx-auto text-center"
             >
-              <CheckCircle className="w-20 h-20 text-emerald-500 mx-auto mb-6" />
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Pesanan Diterima!</h2>
-              <p className="text-slate-600 mb-4">
-                Terima kasih atas pembelian Anda. Pesanan Anda telah berhasil diproses.
-              </p>
+              <div className="w-20 h-20 bg-[#0099FF] flex items-center justify-center mx-auto mb-8">
+                <CheckCircle className="w-10 h-10 text-white" />
+              </div>
+              <p className="text-[10px] uppercase tracking-widest text-black/40 mb-2">Thank you</p>
+              <h2 className="text-4xl font-black uppercase tracking-tight mb-4">Order Received</h2>
+              <p className="text-sm text-black/50 mb-10">Your order is being prepared. We'll have it ready shortly.</p>
 
-              <div className="bg-slate-50 rounded-lg p-6 my-8 text-left">
-                <div className="space-y-3 mb-6">
+              <div className="border border-black/8 p-6 text-left mb-8">
+                <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Nomor Pesanan</span>
-                    <span className="font-bold text-slate-900">{orderId}</span>
+                    <span className="text-black/40 uppercase tracking-wider text-[10px]">Order ID</span>
+                    <span className="font-bold font-mono">{orderId}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Total Pembayaran</span>
-                    <span className="font-bold text-slate-900">
-                      Rp {getCartTotal().toLocaleString('id-ID')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between pt-3 border-t border-slate-200">
-                    <span className="text-slate-600">Poin Diterima</span>
-                    <span className="font-bold text-emerald-600 text-lg">
-                      +{getCartPointsEstimate()} Poin
-                    </span>
+                  <div className="flex justify-between pt-3 border-t border-black/8">
+                    <span className="text-black/40 uppercase tracking-wider text-[10px]">Points Earned</span>
+                    <span className="font-black text-[#0099FF]">+{getCartPointsEstimate().toLocaleString('id-ID')} pts</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-4 flex-col sm:flex-row">
-                <Button asChild className="flex-1 bg-indigo-600 hover:bg-indigo-700">
-                  <Link href="/shop">Lanjut Belanja</Link>
-                </Button>
-                <Button asChild variant="outline" className="flex-1">
-                  <Link href="/account">Lihat Akun Saya</Link>
-                </Button>
+              <div className="flex gap-3">
+                <Link
+                  href="/shop"
+                  className="flex-1 flex items-center justify-center gap-2 bg-black text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors"
+                >
+                  Order Again
+                </Link>
+                <Link
+                  href="/account"
+                  className="flex-1 flex items-center justify-center py-3.5 text-[11px] uppercase tracking-widest border border-black/15 hover:border-black transition-colors"
+                >
+                  My Account
+                </Link>
               </div>
             </motion.div>
+
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Form Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+              {/* Left: form */}
               <div className="lg:col-span-2">
                 {step === 'form' ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="bg-white rounded-lg border border-slate-200 p-8"
-                  >
-                    <h2 className="text-2xl font-bold text-slate-900 mb-6">Informasi Pengiriman</h2>
-
-                    <form onSubmit={handleFormSubmit} className="space-y-6">
-                      {/* Name */}
+                  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+                    <h2 className="text-[10px] uppercase tracking-widest text-black/40 mb-6">Delivery Details</h2>
+                    <form onSubmit={handleFormSubmit} className="space-y-5">
                       <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">
-                          Nama Lengkap
-                        </label>
+                        <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Full Name</label>
                         <Input
                           type="text"
                           value={formData.fullName}
                           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                           required
-                          placeholder="Nama lengkap Anda"
-                          className="w-full"
+                          placeholder="Your full name"
+                          className="border-black/15 focus:border-black bg-transparent"
                         />
                       </div>
-
-                      {/* Email & Phone */}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-slate-900 mb-2">
-                            Email
-                          </label>
+                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Email</label>
                           <Input
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             required
-                            placeholder="Email Anda"
+                            placeholder="email@example.com"
+                            className="border-black/15 focus:border-black bg-transparent"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-slate-900 mb-2">
-                            No. Telepon
-                          </label>
+                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Phone</label>
                           <Input
                             type="tel"
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             required
-                            placeholder="No. telepon"
+                            placeholder="08xxxxxxxxxx"
+                            className="border-black/15 focus:border-black bg-transparent"
                           />
                         </div>
                       </div>
-
-                      {/* Address */}
                       <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">
-                          Alamat Lengkap
-                        </label>
+                        <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Address</label>
                         <textarea
                           value={formData.address}
                           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                           required
-                          placeholder="Jalan, nomor, blok, unit, dst."
+                          placeholder="Street, number, unit..."
                           rows={3}
-                          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
+                          className="w-full px-3 py-2.5 border border-black/15 focus:border-black focus:outline-none text-sm bg-transparent resize-none"
                         />
                       </div>
-
-                      {/* City & Postal */}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-slate-900 mb-2">
-                            Kota
-                          </label>
+                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">City</label>
                           <Input
                             type="text"
                             value={formData.city}
                             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                             required
-                            placeholder="Kota Anda"
+                            placeholder="City"
+                            className="border-black/15 focus:border-black bg-transparent"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-slate-900 mb-2">
-                            Kode Pos
-                          </label>
+                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Postal Code</label>
                           <Input
                             type="text"
                             value={formData.postalCode}
                             onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                             required
-                            placeholder="Kode pos"
+                            placeholder="00000"
+                            className="border-black/15 focus:border-black bg-transparent"
                           />
                         </div>
                       </div>
-
-                      <Button
+                      <button
                         type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-lg font-semibold"
+                        className="w-full bg-black text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors flex items-center justify-center gap-2"
                       >
-                        Lanjut ke Pembayaran
-                      </Button>
+                        Continue to Payment <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </form>
                   </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="bg-white rounded-lg border border-slate-200 p-8"
-                  >
-                    <h2 className="text-2xl font-bold text-slate-900 mb-6">Metode Pembayaran</h2>
 
-                    <div className="space-y-4 mb-8">
-                      {[
-                        { id: 'credit-card', label: 'Kartu Kredit', desc: 'Visa, Mastercard, Amex' },
-                        { id: 'debit-card', label: 'Kartu Debit', desc: 'Debit Bank' },
-                        { id: 'e-wallet', label: 'E-Wallet', desc: 'GoPay, OVO, DANA' },
-                        { id: 'transfer', label: 'Transfer Bank', desc: 'Transfer manual ke rekening kami' },
-                      ].map((method) => (
+                ) : (
+                  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+                    <h2 className="text-[10px] uppercase tracking-widest text-black/40 mb-6">Payment Method</h2>
+                    <div className="space-y-3 mb-8">
+                      {PAYMENT_METHODS.map((method) => (
                         <label
                           key={method.id}
-                          className="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
-                          style={{
-                            borderColor: paymentMethod === method.id ? '#4F46E5' : '#E2E8F0',
-                            backgroundColor: paymentMethod === method.id ? '#F0F4FF' : 'transparent',
-                          }}
+                          className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${
+                            paymentMethod === method.id
+                              ? 'border-black bg-black/3'
+                              : 'border-black/12 hover:border-black/30'
+                          }`}
                         >
                           <input
                             type="radio"
@@ -303,75 +280,49 @@ export default function CheckoutPage() {
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-4 h-4"
                           />
-                          <div className="ml-4">
-                            <p className="font-semibold text-slate-900">{method.label}</p>
-                            <p className="text-sm text-slate-600">{method.desc}</p>
+                          <div>
+                            <p className="text-sm font-semibold uppercase tracking-wider">{method.label}</p>
+                            <p className="text-xs text-black/40">{method.desc}</p>
                           </div>
                         </label>
                       ))}
                     </div>
-
-                    <Button
+                    <button
                       onClick={handlePayment}
                       disabled={isProcessing}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
+                      className="w-full bg-[#0099FF] text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {isProcessing ? 'Memproses...' : 'Bayar Sekarang'}
-                    </Button>
+                      {isProcessing ? 'Processing...' : 'Pay Now'}
+                      {!isProcessing && <ArrowRight className="w-3.5 h-3.5" />}
+                    </button>
                   </motion.div>
                 )}
               </div>
 
-              {/* Order Summary */}
+              {/* Right: summary */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="sticky top-24 h-fit"
+                transition={{ delay: 0.15 }}
+                className="sticky top-28 h-fit"
               >
-                <div className="bg-white rounded-lg border border-slate-200 p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Ringkasan Pesanan</h3>
-
-                  <div className="space-y-3 mb-6 pb-6 border-b border-slate-200 max-h-96 overflow-y-auto">
+                <div className="border border-black/8 p-6">
+                  <h3 className="text-[10px] uppercase tracking-widest text-black/40 mb-5">Your Order</h3>
+                  <div className="space-y-3 pb-5 border-b border-black/8 mb-5 max-h-72 overflow-y-auto">
                     {cartItems.map((item) => (
-                      <div key={item.product.id} className="text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-slate-600">{item.product.name}</span>
-                          <span className="font-semibold text-slate-900">x{item.quantity}</span>
-                        </div>
-                        <div className="flex justify-between text-slate-600 text-xs">
-                          <span>Rp {item.product.price.toLocaleString('id-ID')}</span>
-                          <span>
-                            Rp {(item.product.price * item.quantity).toLocaleString('id-ID')}
-                          </span>
-                        </div>
+                      <div key={item.product.id} className="flex justify-between text-sm">
+                        <span className="text-black/60 truncate pr-3">{item.product.name} ×{item.quantity}</span>
+                        <span className="font-semibold shrink-0">Rp {(item.product.price * item.quantity).toLocaleString('id-ID')}</span>
                       </div>
                     ))}
                   </div>
-
-                  <div className="space-y-3 mb-6 pb-6 border-b border-slate-200">
-                    <div className="flex justify-between text-slate-600">
-                      <span>Subtotal</span>
-                      <span>Rp {getCartTotal().toLocaleString('id-ID')}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Ongkir</span>
-                      <span>Gratis</span>
-                    </div>
+                  <div className="flex justify-between mb-5">
+                    <span className="text-[11px] uppercase tracking-widest font-bold">Total</span>
+                    <span className="font-black">Rp {getCartTotal().toLocaleString('id-ID')}</span>
                   </div>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-lg font-bold text-slate-900">
-                      <span>Total</span>
-                      <span className="text-indigo-600">Rp {getCartTotal().toLocaleString('id-ID')}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                    <p className="text-xs text-emerald-700 mb-1">Poin yang akan didapat</p>
-                    <p className="text-2xl font-bold text-emerald-700">
-                      {getCartPointsEstimate()}
-                    </p>
+                  <div className="bg-[#EFEEED] px-4 py-3">
+                    <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Points to Earn</p>
+                    <p className="font-black text-[#0099FF]">{getCartPointsEstimate().toLocaleString('id-ID')} pts</p>
                   </div>
                 </div>
               </motion.div>

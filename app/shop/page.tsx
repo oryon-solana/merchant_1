@@ -1,303 +1,224 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import Link from 'next/link'
+import { useState, useMemo, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { MOCK_MERCHANTS, MOCK_PRODUCTS } from '@/lib/mock-data'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Search, X, Star, ShoppingCart, ChevronDown } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { Search, ShoppingCart, Star } from 'lucide-react'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useCart } from '@/lib/contexts/CartContext'
 
+const MERCHANT = MOCK_MERCHANTS[0]
+const EASE = [0.25, 0.1, 0.25, 1] as const
+
 export default function ShopPage() {
-  const searchParams = useSearchParams()
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
-  const merchantFilter = searchParams.get('merchant')
-  
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedMerchant, setSelectedMerchant] = useState<string | null>(merchantFilter)
-  const [showFilters, setShowFilters] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
-  // Filter products
+  const categories = Array.from(new Set(MOCK_PRODUCTS.map((p) => p.category)))
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   const filteredProducts = useMemo(() => {
-    return MOCK_PRODUCTS.filter((product) => {
-      const matchSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchCategory = !selectedCategory || product.category === selectedCategory
-      const matchMerchant = !selectedMerchant || product.merchantId === selectedMerchant
-
-      return matchSearch && matchCategory && matchMerchant
+    return MOCK_PRODUCTS.filter((p) => {
+      const matchSearch =
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchCat = !selectedCategory || p.category === selectedCategory
+      return matchSearch && matchCat
     })
-  }, [searchTerm, selectedCategory, selectedMerchant])
-
-  const categories = Array.from(new Set(MOCK_PRODUCTS.map(p => p.category)))
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-  }
+  }, [searchTerm, selectedCategory])
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="bg-card border-b border-border py-6 px-4 sm:px-6 lg:px-8 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-foreground">Belanja</h1>
-            <span className="text-sm text-muted-foreground">
-              {filteredProducts.length} produk ditemukan
-            </span>
-          </div>
-          
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Cari produk atau merchant..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 py-3 bg-background border-border"
-            />
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen bg-white">
 
-      {/* Main Content with Sidebar */}
-      <div className="flex flex-col lg:flex-row gap-8 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {/* Sidebar Filters - Desktop */}
-        <motion.aside
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
-          className="hidden lg:block w-full lg:w-80 flex-shrink-0"
+      {/* ── HEADER (collapses on scroll) ── */}
+      <div className="border-b border-black/8 px-8 md:px-16 sticky top-20 z-40 bg-white">
+        <motion.div
+          animate={{
+            paddingTop: scrolled ? 10 : 40,
+            paddingBottom: scrolled ? 10 : 40,
+          }}
+          transition={{ duration: 0.4, ease: EASE }}
+          className="max-w-350 mx-auto"
         >
-          <div className="bg-card rounded-2xl border border-border p-6 sticky top-32">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-foreground">Filter</h2>
-              {(selectedMerchant || selectedCategory) && (
-                <button
-                  onClick={() => {
-                    setSelectedMerchant(null)
-                    setSelectedCategory(null)
-                  }}
-                  className="text-sm text-primary hover:text-primary/80 transition"
-                >
-                  Reset
-                </button>
-              )}
-            </div>
 
-            <div className="space-y-8">
-              {/* Merchant Filter */}
+          {/* Title block — slides up and fades when scrolled */}
+          <motion.div
+            animate={{
+              height: scrolled ? 0 : 'auto',
+              opacity: scrolled ? 0 : 1,
+              marginBottom: scrolled ? 0 : 24,
+            }}
+            transition={{ duration: 0.38, ease: EASE }}
+            className="overflow-hidden"
+          >
+            <div className="flex items-end justify-between">
               <div>
-                <h3 className="text-sm font-bold text-foreground mb-4 uppercase tracking-wide">Merchant</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedMerchant(null)}
-                    className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                      selectedMerchant === null
-                        ? 'bg-primary/10 text-primary font-semibold'
-                        : 'text-muted-foreground hover:bg-muted'
-                    }`}
-                  >
-                    Semua Merchant
-                  </button>
-                  {MOCK_MERCHANTS.map((merchant) => (
-                    <button
-                      key={merchant.id}
-                      onClick={() => setSelectedMerchant(merchant.id)}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                        selectedMerchant === merchant.id
-                          ? 'bg-primary/10 text-primary font-semibold'
-                          : 'text-muted-foreground hover:bg-muted'
-                      }`}
-                    >
-                      {merchant.name}
-                    </button>
-                  ))}
-                </div>
+                <p className="text-black/40 text-[10px] uppercase tracking-widest mb-1">Blacksinyo Coffee</p>
+                <h1 className="text-2xl font-black uppercase tracking-tight">Our Menu</h1>
               </div>
-
-              {/* Category Filter */}
-              <div className="border-t border-border pt-6">
-                <h3 className="text-sm font-bold text-foreground mb-4 uppercase tracking-wide">Kategori</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedCategory(null)}
-                    className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                      selectedCategory === null
-                        ? 'bg-primary/10 text-primary font-semibold'
-                        : 'text-muted-foreground hover:bg-muted'
-                    }`}
-                  >
-                    Semua Kategori
-                  </button>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                        selectedCategory === cat
-                          ? 'bg-primary/10 text-primary font-semibold'
-                          : 'text-muted-foreground hover:bg-muted'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <span className="text-[11px] text-black/40 uppercase tracking-widest pb-0.5">
+                {filteredProducts.length} items
+              </span>
             </div>
-          </div>
-        </motion.aside>
+          </motion.div>
 
-        {/* Products Grid */}
-        <motion.main
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="flex-1 min-w-0"
-        >
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-24 bg-card rounded-2xl border border-border">
-              <div className="space-y-4">
-                <p className="text-muted-foreground text-lg">Produk tidak ditemukan</p>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchTerm('')
-                    setSelectedCategory(null)
-                    setSelectedMerchant(null)
-                  }}
-                  className="mx-auto"
+          {/* Search row — item count fades in inline when collapsed */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/30" />
+              <input
+                type="text"
+                placeholder="Search drinks, pastries..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 border border-black/12 bg-transparent text-sm placeholder:text-black/30 focus:outline-none focus:border-black transition-colors"
+              />
+            </div>
+
+            <AnimatePresence>
+              {scrolled && (
+                <motion.span
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  transition={{ duration: 0.22, ease: EASE }}
+                  className="shrink-0 text-[11px] text-black/35 uppercase tracking-widest"
                 >
-                  Reset Filter
-                </Button>
-              </div>
+                  {filteredProducts.length} items
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Category tabs */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`shrink-0 px-4 py-1.5 text-[11px] uppercase tracking-widest transition-colors ${
+                selectedCategory === null
+                  ? 'bg-black text-white'
+                  : 'border border-black/15 text-black/50 hover:border-black hover:text-black'
+              }`}
+            >
+              All
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`shrink-0 px-4 py-1.5 text-[11px] uppercase tracking-widest transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-black text-white'
+                    : 'border border-black/15 text-black/50 hover:border-black hover:text-black'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ── PRODUCT GRID ── */}
+      <section className="py-12 px-8 md:px-16">
+        <div className="max-w-350 mx-auto">
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-32">
+              <p className="text-black/30 text-[11px] uppercase tracking-widest mb-3">No results</p>
+              <button
+                onClick={() => { setSearchTerm(''); setSelectedCategory(null) }}
+                className="text-[11px] uppercase tracking-widest border border-black px-6 py-2.5 hover:bg-black hover:text-white transition-colors"
+              >
+                Clear Filters
+              </button>
             </div>
           ) : (
             <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-6"
+              key={`${searchTerm}-${selectedCategory}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
             >
-              {filteredProducts.map((product) => {
-                const merchant = MOCK_MERCHANTS.find(m => m.id === product.merchantId)
-                const pointsEarned = Math.floor(product.price * (merchant?.pointsMultiplier || 0))
-
+              {filteredProducts.map((product, idx) => {
+                const pts = Math.floor(product.price * MERCHANT.pointsMultiplier)
                 return (
                   <motion.div
                     key={product.id}
-                    variants={itemVariants}
-                    whileHover={{ y: -4 }}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: idx * 0.04 }}
                     className="group"
                   >
-                    <div className="bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/40 hover:shadow-lg transition-all h-full flex flex-col">
-                      {/* Product Image */}
-                      <div className="relative h-52 md:h-60 bg-muted overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-3 right-3 bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-lg">
-                          {merchant?.pointsMultiplier}x Poin
+                    <div className="relative overflow-hidden bg-[#EFEEED] aspect-square mb-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
+                      />
+                      <div className="absolute top-3 right-3 bg-[#0099FF] text-white text-[10px] px-2 py-0.5 uppercase tracking-wider">
+                        +{pts} pts
+                      </div>
+                      {product.sold && product.sold > 2000 && (
+                        <div className="absolute bottom-3 left-3 bg-black/70 text-white text-[10px] px-2 py-0.5 uppercase tracking-wider">
+                          Popular
                         </div>
-                        {product.sold && product.sold > 1000 && (
-                          <div className="absolute bottom-3 left-3 bg-foreground/80 text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-lg">
-                            Laku {(product.sold / 1000).toFixed(1)}rb+
-                          </div>
-                        )}
+                      )}
+                    </div>
+
+                    <p className="text-[10px] uppercase tracking-widest text-black/35 mb-1">{product.category}</p>
+                    <h3 className="text-sm font-semibold leading-tight mb-1">{product.name}</h3>
+
+                    {product.rating && (
+                      <div className="flex items-center gap-1 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-3 h-3 ${
+                              i < Math.floor(product.rating!) ? 'fill-amber-400 text-amber-400' : 'text-black/15'
+                            }`}
+                          />
+                        ))}
                       </div>
+                    )}
 
-                      {/* Product Info */}
-                      <div className="p-5 flex-1 flex flex-col">
-                        {/* Merchant */}
-                        <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-2">
-                          {merchant?.name}
-                        </p>
+                    <span className="text-sm font-bold">Rp {product.price.toLocaleString('id-ID')}</span>
 
-                        <h3 className="text-sm font-semibold text-foreground mb-2 line-clamp-2 leading-tight">
-                          {product.name}
-                        </h3>
-
-                        {/* Rating */}
-                        {product.rating && (
-                          <div className="flex items-center gap-2 mb-4">
-                            <div className="flex gap-0.5">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`w-3.5 h-3.5 ${
-                                    i < Math.floor(product.rating!) ? 'fill-amber-400 text-amber-400' : 'text-border'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <span className="text-xs text-muted-foreground">({product.sold})</span>
-                          </div>
-                        )}
-
-                        {/* Price and Points */}
-                        <div className="mt-auto space-y-3 pt-4 border-t border-border">
-                          <div className="flex items-baseline justify-between">
-                            <span className="text-base font-bold text-foreground">
-                              Rp {product.price.toLocaleString('id-ID')}
-                            </span>
-                          </div>
-                          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-2 rounded-lg text-xs font-bold">
-                            <span>+{pointsEarned}</span>
-                            <span className="text-primary/80">Poin</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Add to Cart / Login Button */}
-                      <div className="px-5 pb-5">
-                        {isAuthenticated ? (
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => {
-                              if (merchant) {
-                                addToCart(product, merchant, 1)
-                              }
-                            }}
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-4 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md"
-                          >
-                            <ShoppingCart className="w-4 h-4" />
-                            Tambah Keranjang
-                          </motion.button>
-                        ) : (
-                          <Link href="/login" className="w-full block">
-                            <button className="w-full bg-muted hover:bg-muted/80 text-foreground py-3 px-4 text-sm font-semibold rounded-lg transition-all">
-                              Masuk untuk Beli
-                            </button>
-                          </Link>
-                        )}
-                      </div>
+                    <div className="mt-3">
+                      {isAuthenticated ? (
+                        <motion.button
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => addToCart(product, MERCHANT, 1)}
+                          className="w-full bg-black text-white py-2.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors flex items-center justify-center gap-2"
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5" />
+                          Add to Order
+                        </motion.button>
+                      ) : (
+                        <a
+                          href="/login"
+                          className="w-full block text-center border border-black/20 text-black/50 py-2.5 text-[11px] uppercase tracking-widest hover:border-black hover:text-black transition-colors"
+                        >
+                          Sign in to Order
+                        </a>
+                      )}
                     </div>
                   </motion.div>
                 )
               })}
             </motion.div>
           )}
-        </motion.main>
-      </div>
+        </div>
+      </section>
     </div>
   )
 }

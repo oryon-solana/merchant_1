@@ -17,8 +17,7 @@ import {
 import { ShoppingCart, Gift, LogOut, User, X, Menu } from 'lucide-react'
 
 const NAV_LINKS = [
-  { label: 'Shop', href: '/shop' },
-  { label: 'Merchants', href: '/merchants' },
+  { label: 'Menu', href: '/shop' },
 ]
 
 export default function Navbar() {
@@ -30,6 +29,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const isAuthPage = pathname === '/login' || pathname === '/register'
   const isHome = pathname === '/'
   const transparent = isHome && !scrolled
 
@@ -39,8 +39,9 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile menu on route change
   useEffect(() => { setMobileOpen(false) }, [pathname])
+
+  if (isAuthPage) return null
 
   const handleLogout = () => {
     logout()
@@ -60,15 +61,14 @@ export default function Navbar() {
           transparent ? 'bg-transparent' : 'bg-white border-b border-black/8'
         }`}
       >
-        <div className="max-w-350 mx-auto px-8 py-5">
-          <div className="flex items-center justify-between">
+        <div className="max-w-350 mx-auto px-8 h-20 flex items-center justify-between">
 
             {/* Logo */}
             <Link
               href="/"
               className={`text-sm font-black uppercase tracking-widest transition-colors ${textColor}`}
             >
-              NusaPoints
+              Blacksinyo
             </Link>
 
             {/* Desktop nav links */}
@@ -77,7 +77,7 @@ export default function Navbar() {
                 <Link
                   key={label}
                   href={href}
-                  className={`relative text-[11px] uppercase tracking-widest transition-colors group ${mutedColor} hover:${transparent ? 'text-white' : 'text-black'}`}
+                  className={`relative text-[11px] uppercase tracking-widest transition-colors group ${mutedColor}`}
                 >
                   {label}
                   <span
@@ -166,7 +166,7 @@ export default function Navbar() {
                         : 'bg-black text-white hover:bg-black/80'
                     }`}
                   >
-                    Register
+                    Join Free
                   </Link>
                 </div>
               )}
@@ -180,11 +180,10 @@ export default function Navbar() {
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
-          </div>
         </div>
       </motion.nav>
 
-      {/* ── Mobile menu ── */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -213,6 +212,9 @@ export default function Navbar() {
                     <Gift className="w-4 h-4" />
                     {getTotalPoints().toLocaleString('id-ID')} pts
                   </div>
+                  <Link href="/account" className="text-[11px] uppercase tracking-widest text-black/50">
+                    Profile
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="text-[11px] uppercase tracking-widest text-red-500 text-left"
@@ -229,7 +231,7 @@ export default function Navbar() {
                     href="/register"
                     className="bg-black text-white text-[11px] uppercase tracking-widest px-6 py-3 text-center hover:bg-[#0099FF] transition-colors"
                   >
-                    Register Free
+                    Join Free
                   </Link>
                 </>
               )}

@@ -5,40 +5,27 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/lib/contexts/CartContext'
 import { useAuth } from '@/lib/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
-import { MOCK_MERCHANTS } from '@/lib/mock-data'
-import { Trash2, ShoppingBag, ArrowLeft, Lock } from 'lucide-react'
+import { Trash2, ShoppingBag, ArrowLeft, Lock, ArrowRight } from 'lucide-react'
 
 export default function CartPage() {
   const router = useRouter()
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, getCartPointsEstimate } = useCart()
   const { isAuthenticated } = useAuth()
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
-  }
-
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-md">
-          <div className="bg-primary/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-10 h-10 text-primary" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground mb-3">Masuk Diperlukan</h1>
-          <p className="text-muted-foreground mb-8">Anda harus masuk untuk mengakses keranjang belanja dan melakukan pembelian.</p>
-          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link href="/login">Masuk ke Akun</Link>
-          </Button>
+      <div className="min-h-screen bg-white flex items-center justify-center px-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-sm">
+          <Lock className="w-10 h-10 text-black/20 mx-auto mb-6" />
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-2">Access Required</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight mb-4">Sign In First</h1>
+          <p className="text-sm text-black/50 mb-8">You need an account to view your cart and place orders.</p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 bg-black text-white px-8 py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors"
+          >
+            Sign In <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </motion.div>
       </div>
     )
@@ -46,183 +33,152 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-md">
-          <div className="bg-primary/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag className="w-10 h-10 text-primary" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground mb-3">Keranjang Kosong</h1>
-          <p className="text-muted-foreground mb-8">Belum ada produk di keranjang Anda. Mulai berbelanja sekarang!</p>
-          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link href="/shop">Lanjut Belanja</Link>
-          </Button>
+      <div className="min-h-screen bg-white flex items-center justify-center px-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-sm">
+          <ShoppingBag className="w-10 h-10 text-black/20 mx-auto mb-6" />
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-2">Empty</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight mb-4">Your Cart</h1>
+          <p className="text-sm text-black/50 mb-8">Nothing here yet. Explore the menu and add your favorites.</p>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 bg-black text-white px-8 py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors"
+          >
+            View Menu <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <section className="bg-card border-b border-border py-6 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="border-b border-black/8 py-8 px-8 md:px-16">
+        <div className="max-w-350 mx-auto">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-primary hover:text-primary/80 mb-4 transition"
+            className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/40 hover:text-black mb-5 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Kembali
+            <ArrowLeft className="w-3.5 h-3.5" /> Back
           </button>
-          <h1 className="text-3xl font-bold text-foreground">Keranjang Belanja</h1>
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Blacksinyo Coffee</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight">Your Order</h1>
         </div>
       </section>
 
-      {/* Cart Content */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
-          <div className="lg:col-span-2">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-4"
-            >
-              {cartItems.map((item, idx) => {
-                const pointsEarned = Math.floor(
-                  item.product.price * item.quantity * item.merchant.pointsMultiplier
-                )
+      {/* Content */}
+      <section className="py-12 px-8 md:px-16">
+        <div className="max-w-350 mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-                return (
-                  <motion.div
-                    key={item.product.id}
-                    variants={itemVariants}
-                    className="bg-card rounded-2xl border border-border p-5 hover:border-primary/40 transition-all"
-                  >
-                    <div className="flex gap-4">
-                      {/* Product Image */}
-                      <div className="flex-shrink-0 w-28 h-28 bg-muted rounded-xl overflow-hidden">
-                        <img
-                          src={item.product.image}
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+          {/* Cart items */}
+          <div className="lg:col-span-2 space-y-0 divide-y divide-black/8">
+            {cartItems.map((item) => {
+              const pts = Math.floor(item.product.price * item.quantity * item.merchant.pointsMultiplier)
+              return (
+                <motion.div
+                  key={item.product.id}
+                  layout
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  className="flex gap-5 py-6"
+                >
+                  {/* Image */}
+                  <div className="shrink-0 w-24 h-24 bg-[#EFEEED] overflow-hidden">
+                    <img
+                      src={item.product.image}
+                      alt={item.product.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
+                    />
+                  </div>
 
-                      {/* Product Details */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{item.merchant.name}</p>
-                        <h3 className="font-semibold text-foreground mb-2">{item.product.name}</h3>
-                        <div className="flex items-baseline gap-3">
-                          <span className="font-bold text-foreground">
-                            Rp {item.product.price.toLocaleString('id-ID')}
-                          </span>
-                          <span className="text-xs bg-primary/10 text-primary font-bold px-2.5 py-1 rounded-lg">
-                            +{Math.floor(item.product.price * item.merchant.pointsMultiplier)} Poin
-                          </span>
-                        </div>
-                      </div>
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase tracking-widest text-black/35 mb-1">{item.product.category}</p>
+                    <h3 className="font-semibold text-sm mb-2">{item.product.name}</h3>
+                    <p className="text-sm font-bold mb-1">Rp {item.product.price.toLocaleString('id-ID')}</p>
+                    <p className="text-[11px] text-[#0099FF] uppercase tracking-wider">+{pts} pts</p>
+                  </div>
 
-                      {/* Quantity and Actions */}
-                      <div className="flex flex-col items-end gap-4">
-                        <button
-                          onClick={() => removeFromCart(item.product.id)}
-                          className="text-red-600 hover:text-red-700 p-1"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                  {/* Qty + Remove */}
+                  <div className="flex flex-col items-end gap-4">
+                    <button
+                      onClick={() => removeFromCart(item.product.id)}
+                      className="text-black/25 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
 
-                        <div className="flex items-center border border-slate-300 rounded-lg">
-                          <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                            className="px-3 py-1 hover:bg-slate-100"
-                          >
-                            -
-                          </button>
-                          <span className="px-4 py-1 font-semibold min-w-12 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                            className="px-3 py-1 hover:bg-slate-100"
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        <div className="text-right">
-                          <p className="text-sm text-slate-600">Subtotal</p>
-                          <p className="font-bold text-slate-900">
-                            Rp {(item.product.price * item.quantity).toLocaleString('id-ID')}
-                          </p>
-                          <p className="text-xs text-emerald-600 font-semibold">
-                            +{pointsEarned} Poin
-                          </p>
-                        </div>
-                      </div>
+                    <div className="flex items-center border border-black/15">
+                      <button
+                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                        className="w-8 h-8 flex items-center justify-center text-black/50 hover:bg-black/5 transition-colors"
+                      >
+                        −
+                      </button>
+                      <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                        className="w-8 h-8 flex items-center justify-center text-black/50 hover:bg-black/5 transition-colors"
+                      >
+                        +
+                      </button>
                     </div>
-                  </motion.div>
-                )
-              })}
-            </motion.div>
+
+                    <p className="text-sm font-bold">
+                      Rp {(item.product.price * item.quantity).toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
 
-          {/* Order Summary */}
+          {/* Order summary */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="sticky top-24 h-fit"
+            transition={{ delay: 0.2 }}
+            className="sticky top-28 h-fit"
           >
-            <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Ringkasan Pesanan</h2>
+            <div className="border border-black/8 p-8">
+              <h2 className="text-[10px] uppercase tracking-widest text-black/40 mb-6">Order Summary</h2>
 
-              {/* Order Details */}
-              <div className="space-y-4 mb-6 pb-6 border-b border-slate-200">
-                <div className="flex justify-between text-slate-600">
+              <div className="space-y-3 pb-6 border-b border-black/8 mb-6">
+                <div className="flex justify-between text-sm text-black/50">
                   <span>Subtotal</span>
                   <span>Rp {getCartTotal().toLocaleString('id-ID')}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Ongkir</span>
-                  <span>Gratis</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Pajak</span>
-                  <span>Rp 0</span>
+                <div className="flex justify-between text-sm text-black/50">
+                  <span>Delivery</span>
+                  <span>Free</span>
                 </div>
               </div>
 
-              {/* Total */}
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-semibold text-slate-900">Total</span>
-                  <span className="text-2xl font-bold text-indigo-600">
-                    Rp {getCartTotal().toLocaleString('id-ID')}
-                  </span>
-                </div>
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                  <p className="text-xs text-emerald-700 mb-1">Poin yang akan didapat</p>
-                  <p className="text-xl font-bold text-emerald-700">
-                    {getCartPointsEstimate()} Poin
-                  </p>
-                </div>
+              <div className="flex justify-between mb-4">
+                <span className="font-bold uppercase tracking-wider text-sm">Total</span>
+                <span className="font-black text-xl">Rp {getCartTotal().toLocaleString('id-ID')}</span>
               </div>
 
-              {/* Checkout Button */}
-              <Button
-                asChild
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-lg font-semibold"
-              >
-                <Link href="/checkout">Lanjut ke Pembayaran</Link>
-              </Button>
+              <div className="bg-[#EFEEED] px-4 py-3 mb-6">
+                <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Points to Earn</p>
+                <p className="text-lg font-black text-[#0099FF]">{getCartPointsEstimate().toLocaleString('id-ID')} pts</p>
+              </div>
 
-              {/* Continue Shopping */}
-              <Button
-                asChild
-                variant="outline"
-                className="w-full mt-3"
+              <Link
+                href="/checkout"
+                className="w-full flex items-center justify-center gap-2 bg-black text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors"
               >
-                <Link href="/shop">Lanjut Belanja</Link>
-              </Button>
+                Checkout <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+
+              <Link
+                href="/shop"
+                className="w-full flex items-center justify-center mt-3 py-3 text-[11px] uppercase tracking-widest text-black/40 hover:text-black transition-colors border border-black/10 hover:border-black"
+              >
+                Continue Shopping
+              </Link>
             </div>
           </motion.div>
         </div>

@@ -1,163 +1,136 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { usePoints } from '@/lib/contexts/PointsContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 
 export default function AccountPage() {
   const { user } = useAuth()
   const { points, getTotalPoints } = usePoints()
 
-  if (!user) {
-    return null
-  }
+  if (!user) return null
 
   const totalPoints = getTotalPoints()
   const recentTransactions = points?.transactions.slice(0, 5) || []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Akun Saya</h1>
-          <p className="text-slate-600">Kelola profil dan poin loyalitas Anda</p>
+    <div className="min-h-screen bg-white">
+      <section className="border-b border-black/8 py-10 px-8 md:px-16">
+        <div className="max-w-350 mx-auto">
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Blacksinyo Coffee</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight">My Account</h1>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Profile Section */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <span className="text-3xl">👤</span> Profil Pengguna
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+      <section className="py-12 px-8 md:px-16">
+        <div className="max-w-350 mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+          {/* Profile */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="lg:col-span-1"
+          >
+            <div className="border border-black/8 p-8 sticky top-28">
+              <p className="text-[10px] uppercase tracking-widest text-black/40 mb-6">Profile</p>
+
+              <div className="w-14 h-14 bg-black flex items-center justify-center text-white text-xl font-black mb-6">
+                {user.name?.[0]?.toUpperCase()}
+              </div>
+
+              <div className="space-y-5">
                 <div>
-                  <p className="text-sm text-slate-600">Nama Lengkap</p>
-                  <p className="font-semibold text-slate-900">{user.name}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-black/35 mb-1">Name</p>
+                  <p className="font-semibold text-sm">{user.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-600">Email</p>
-                  <p className="font-semibold text-slate-900">{user.email}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-black/35 mb-1">Email</p>
+                  <p className="font-semibold text-sm">{user.email}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-600">Nomor Telepon</p>
-                  <p className="font-semibold text-slate-900">{user.phone}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-black/35 mb-1">Phone</p>
+                  <p className="font-semibold text-sm">{user.phone}</p>
                 </div>
-                <Button variant="outline" className="w-full">
-                  Edit Profil
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
+          </motion.div>
 
-          {/* Points & Transactions */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Points Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Total Points */}
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                <CardHeader>
-                  <CardTitle className="text-lg">Total Poin</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-4">
-                    <div className="text-5xl">⭐</div>
-                    <div>
-                      <p className="text-4xl font-bold text-blue-600">
-                        {totalPoints.toLocaleString('id-ID')}
-                      </p>
-                      <p className="text-sm text-slate-600">poin tersedia</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Points + Transactions */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="lg:col-span-2 space-y-6"
+          >
+            {/* Points cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-black text-white p-8">
+                <p className="text-[10px] uppercase tracking-widest text-white/40 mb-3">Total Points</p>
+                <p className="text-5xl font-black tabular-nums">{totalPoints.toLocaleString('id-ID')}</p>
+                <p className="text-white/40 text-[11px] uppercase tracking-wider mt-2">poin available</p>
+              </div>
 
-              {/* Transactions Count */}
-              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                <CardHeader>
-                  <CardTitle className="text-lg">Riwayat Transaksi</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-4">
-                    <div className="text-5xl">📊</div>
-                    <div>
-                      <p className="text-4xl font-bold text-green-600">
-                        {points?.transactions.length || 0}
-                      </p>
-                      <p className="text-sm text-slate-600">transaksi</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="border border-black/8 p-8">
+                <p className="text-[10px] uppercase tracking-widest text-black/40 mb-3">Transactions</p>
+                <p className="text-5xl font-black tabular-nums">{points?.transactions.length || 0}</p>
+                <p className="text-black/40 text-[11px] uppercase tracking-wider mt-2">total orders</p>
+              </div>
             </div>
 
-            {/* Recent Transactions */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Transaksi Terbaru</CardTitle>
-                    <CardDescription>Riwayat belanja 5 transaksi terakhir</CardDescription>
-                  </div>
-                  <Link href="/points-history" className="text-blue-600 hover:underline text-sm font-semibold">
-                    Lihat Semua
+            {/* Recent transactions */}
+            <div className="border border-black/8">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-black/8">
+                <p className="text-[10px] uppercase tracking-widest text-black/40">Recent Orders</p>
+                <Link
+                  href="/points-history"
+                  className="flex items-center gap-1 text-[11px] uppercase tracking-widest text-black/40 hover:text-black transition-colors"
+                >
+                  View All <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+
+              {recentTransactions.length > 0 ? (
+                <div className="divide-y divide-black/8">
+                  {recentTransactions.map((trans) => (
+                    <div key={trans.id} className="flex items-start justify-between px-6 py-5">
+                      <div className="flex-1 min-w-0 pr-4">
+                        <p className="text-sm font-semibold mb-1">
+                          {trans.items.map((i) => i.productName).join(', ')}
+                        </p>
+                        <p className="text-[11px] text-black/35 uppercase tracking-wider">
+                          {new Date(trans.timestamp).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                          {' · '}
+                          {trans.items.length} item{trans.items.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-bold mb-1">Rp {trans.amount.toLocaleString('id-ID')}</p>
+                        <p className="text-[11px] font-semibold text-[#0099FF]">+{trans.pointsEarned.toLocaleString('id-ID')} pts</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16 px-6">
+                  <p className="text-[11px] uppercase tracking-widest text-black/30 mb-4">No orders yet</p>
+                  <Link
+                    href="/shop"
+                    className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors"
+                  >
+                    Browse Menu <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {recentTransactions.length > 0 ? (
-                  <div className="space-y-3">
-                    {recentTransactions.map((trans) => (
-                      <div
-                        key={trans.id}
-                        className="flex items-start justify-between p-4 border rounded-lg hover:bg-slate-50 transition"
-                      >
-                        <div className="flex-1">
-                          <p className="font-semibold text-slate-900">{trans.merchantName}</p>
-                          <p className="text-sm text-slate-600">
-                            {trans.items.length} item • {new Date(trans.timestamp).toLocaleDateString('id-ID')}
-                          </p>
-                          <div className="mt-2 space-y-1">
-                            {trans.items.map((item, idx) => (
-                              <p key={idx} className="text-xs text-slate-600">
-                                {item.productName} x{item.quantity}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-slate-900">
-                            Rp{trans.amount.toLocaleString('id-ID')}
-                          </p>
-                          <p className="text-sm font-semibold text-green-600 mt-1">
-                            +{trans.pointsEarned} poin
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-3xl mb-2">🛒</p>
-                    <p className="text-slate-600">Belum ada transaksi</p>
-                    <p className="text-sm text-slate-500 mt-1">Mulai berbelanja di merchant pilihan</p>
-                    <Link href="/merchants">
-                      <Button className="mt-4 bg-blue-600 hover:bg-blue-700">
-                        Mulai Belanja
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+              )}
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
