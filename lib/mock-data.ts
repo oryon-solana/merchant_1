@@ -33,7 +33,7 @@ export const MOCK_MERCHANTS: Merchant[] = [
 
 export const MOCK_PRODUCTS: Product[] = [
   {
-    id: 'bs-1',
+    id: '11111111-0000-0000-0000-000000000001',
     merchantId: 'blacksinyo',
     name: 'Espresso',
     description: 'Pure, concentrated coffee shot with rich crema and bold flavor profile',
@@ -44,7 +44,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 3200,
   },
   {
-    id: 'bs-2',
+    id: '11111111-0000-0000-0000-000000000002',
     merchantId: 'blacksinyo',
     name: 'Americano',
     description: 'Espresso diluted with hot water for a smooth, full-bodied black coffee',
@@ -55,7 +55,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 2800,
   },
   {
-    id: 'bs-3',
+    id: '11111111-0000-0000-0000-000000000003',
     merchantId: 'blacksinyo',
     name: 'Cappuccino',
     description: 'Classic Italian coffee with equal parts espresso, steamed milk and velvety microfoam',
@@ -66,7 +66,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 4100,
   },
   {
-    id: 'bs-4',
+    id: '11111111-0000-0000-0000-000000000004',
     merchantId: 'blacksinyo',
     name: 'Caffe Latte',
     description: 'Smooth espresso with velvety steamed milk and a delicate layer of foam',
@@ -77,7 +77,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 3900,
   },
   {
-    id: 'bs-5',
+    id: '11111111-0000-0000-0000-000000000005',
     merchantId: 'blacksinyo',
     name: 'Caramel Macchiato',
     description: 'Vanilla-infused milk marked with espresso and a generous drizzle of caramel',
@@ -88,7 +88,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 5600,
   },
   {
-    id: 'bs-6',
+    id: '11111111-0000-0000-0000-000000000006',
     merchantId: 'blacksinyo',
     name: 'Cold Brew',
     description: 'Slow-steeped for 18 hours — smooth, naturally sweet, served over ice',
@@ -99,7 +99,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 2200,
   },
   {
-    id: 'bs-7',
+    id: '11111111-0000-0000-0000-000000000007',
     merchantId: 'blacksinyo',
     name: 'Matcha Latte',
     description: 'Premium Japanese matcha whisked with steamed milk for a creamy, earthy delight',
@@ -110,7 +110,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 1900,
   },
   {
-    id: 'bs-8',
+    id: '11111111-0000-0000-0000-000000000008',
     merchantId: 'blacksinyo',
     name: 'Iced Chocolate',
     description: 'Rich Belgian chocolate blended with cold milk for ultimate indulgence',
@@ -121,7 +121,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 1750,
   },
   {
-    id: 'bs-9',
+    id: '11111111-0000-0000-0000-000000000009',
     merchantId: 'blacksinyo',
     name: 'Butter Croissant',
     description: 'Flaky, golden croissant made with French butter and laminated to perfection',
@@ -132,7 +132,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 3400,
   },
   {
-    id: 'bs-10',
+    id: '11111111-0000-0000-0000-000000000010',
     merchantId: 'blacksinyo',
     name: 'Banana Bread',
     description: 'Moist, dense banana bread with toasted walnuts, served warm',
@@ -143,7 +143,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 1800,
   },
   {
-    id: 'bs-11',
+    id: '11111111-0000-0000-0000-000000000011',
     merchantId: 'blacksinyo',
     name: 'Cheesecake',
     description: 'Creamy New York-style cheesecake on a buttery graham cracker crust',
@@ -154,7 +154,7 @@ export const MOCK_PRODUCTS: Product[] = [
     sold: 2600,
   },
   {
-    id: 'bs-12',
+    id: '11111111-0000-0000-0000-000000000012',
     merchantId: 'blacksinyo',
     name: 'Tiramisu',
     description: 'Classic Italian dessert with espresso-soaked ladyfingers and mascarpone cream',

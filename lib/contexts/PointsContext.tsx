@@ -1,14 +1,14 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { Transaction, PointsBalance } from '../types'
-import { MOCK_TRANSACTIONS, MOCK_USER_POINTS_DATA } from '../mock-data'
+import { apiFetch } from '../api-client'
 import { useAuth } from './AuthContext'
 
 interface PointsContextType {
   points: PointsBalance | null
   isLoading: boolean
-  addTransaction: (transaction: Transaction) => void
+  refreshPoints: () => Promise<void>
   getTransactions: () => Transaction[]
   getTotalPoints: () => number
 }
@@ -18,65 +18,57 @@ const PointsContext = createContext<PointsContextType | undefined>(undefined)
 export function PointsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
   const [points, setPoints] = useState<PointsBalance | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
-  // Initialize points data from localStorage or mock data
+  const refreshPoints = useCallback(async () => {
+    if (!user) return
+    setIsLoading(true)
+    try {
+      const res = await apiFetch('/api/points')
+      if (!res.ok) return
+      const data: {
+        total_points: number
+        history: { id: string; points: number; type: string; note: string; created_at: string; order_id: string }[]
+      } = await res.json()
+
+      const transactions: Transaction[] = data.history.map((tx) => ({
+        id: tx.id,
+        userId: user.id,
+        merchantId: 'blacksinyo',
+        merchantName: 'Blacksinyo Coffee',
+        amount: 0,
+        pointsEarned: tx.points,
+        timestamp: new Date(tx.created_at),
+        items: [],
+      }))
+
+      setPoints({
+        totalPoints: data.total_points,
+        availablePoints: data.total_points,
+        redeemedPoints: 0,
+        transactions,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [user])
+
   useEffect(() => {
     if (user) {
-      const storedPoints = localStorage.getItem(`points-${user.id}`)
-      if (storedPoints) {
-        const parsedPoints = JSON.parse(storedPoints)
-        setPoints(parsedPoints)
-      } else {
-        // Initialize with mock data for demo user
-        const userTransactions = MOCK_TRANSACTIONS.filter(t => t.userId === user.id)
-        const totalPoints = userTransactions.reduce((sum, t) => sum + t.pointsEarned, 0) + MOCK_USER_POINTS_DATA.totalPoints
-
-        const pointsData: PointsBalance = {
-          totalPoints,
-          availablePoints: totalPoints,
-          redeemedPoints: 0,
-          transactions: userTransactions,
-        }
-        setPoints(pointsData)
-        localStorage.setItem(`points-${user.id}`, JSON.stringify(pointsData))
-      }
+      refreshPoints()
     } else {
       setPoints(null)
     }
-    setIsLoading(false)
-  }, [user])
-
-  const addTransaction = (transaction: Transaction) => {
-    if (!user || !points) return
-
-    const updatedPoints: PointsBalance = {
-      ...points,
-      totalPoints: points.totalPoints + transaction.pointsEarned,
-      availablePoints: points.availablePoints + transaction.pointsEarned,
-      transactions: [transaction, ...points.transactions],
-    }
-
-    setPoints(updatedPoints)
-    localStorage.setItem(`points-${user.id}`, JSON.stringify(updatedPoints))
-  }
-
-  const getTransactions = () => {
-    return points?.transactions || []
-  }
-
-  const getTotalPoints = () => {
-    return points?.totalPoints || 0
-  }
+  }, [user, refreshPoints])
 
   return (
     <PointsContext.Provider
       value={{
         points,
         isLoading,
-        addTransaction,
-        getTransactions,
-        getTotalPoints,
+        refreshPoints,
+        getTransactions: () => points?.transactions ?? [],
+        getTotalPoints: () => points?.totalPoints ?? 0,
       }}
     >
       {children}
@@ -86,8 +78,6 @@ export function PointsProvider({ children }: { children: React.ReactNode }) {
 
 export function usePoints() {
   const context = useContext(PointsContext)
-  if (context === undefined) {
-    throw new Error('usePoints must be used within PointsProvider')
-  }
+  if (context === undefined) throw new Error('usePoints must be used within PointsProvider')
   return context
 }

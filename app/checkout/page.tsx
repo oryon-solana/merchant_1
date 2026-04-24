@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useCart } from '@/lib/contexts/CartContext'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { usePoints } from '@/lib/contexts/PointsContext'
+import { apiFetch } from '@/lib/api-client'
 import { Input } from '@/components/ui/input'
 import { Lock, ArrowLeft, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'
 
@@ -14,7 +15,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { cartItems, getCartTotal, getCartPointsEstimate, clearCart } = useCart()
   const { user, isAuthenticated } = useAuth()
-  const { addTransaction } = usePoints()
+  const { refreshPoints } = usePoints()
   const [step, setStep] = useState<'form' | 'payment' | 'success'>('form')
   const [formData, setFormData] = useState({
     fullName: user?.name || '',
@@ -27,6 +28,8 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('e-wallet')
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderId, setOrderId] = useState('')
+  const [pointsEarned, setPointsEarned] = useState(0)
+  const [checkoutError, setCheckoutError] = useState('')
 
   if (!isAuthenticated) {
     return (
@@ -72,29 +75,26 @@ export default function CheckoutPage() {
     }
   }
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setIsProcessing(true)
-    setTimeout(() => {
-      const newOrderId = `BS-${Date.now()}`
-      setOrderId(newOrderId)
-      addTransaction({
-        id: newOrderId,
-        userId: user!.id,
-        merchantId: 'blacksinyo',
-        merchantName: 'Blacksinyo Coffee',
-        amount: getCartTotal(),
-        pointsEarned: getCartPointsEstimate(),
-        timestamp: new Date(),
-        items: cartItems.map((item) => ({
-          productName: item.product.name,
-          quantity: item.quantity,
-          price: item.product.price,
-        })),
-      })
+    setCheckoutError('')
+    try {
+      const res = await apiFetch('/api/orders', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        setCheckoutError(data.error ?? 'Payment failed. Please try again.')
+        return
+      }
+      setOrderId(data.order.id)
+      setPointsEarned(data.points_summary.earned)
       clearCart()
+      await refreshPoints()
       setStep('success')
+    } catch {
+      setCheckoutError('Something went wrong. Please try again.')
+    } finally {
       setIsProcessing(false)
-    }, 2000)
+    }
   }
 
   const PAYMENT_METHODS = [
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between pt-3 border-t border-black/8">
                     <span className="text-black/40 uppercase tracking-wider text-[10px]">Points Earned</span>
-                    <span className="font-black text-[#0099FF]">+{getCartPointsEstimate().toLocaleString('id-ID')} pts</span>
+                    <span className="font-black text-[#0099FF]">+{pointsEarned.toLocaleString('id-ID')} pts</span>
                   </div>
                 </div>
               </div>
@@ -287,6 +287,9 @@ export default function CheckoutPage() {
                         </label>
                       ))}
                     </div>
+                    {checkoutError && (
+                      <p className="text-red-600 text-sm">{checkoutError}</p>
+                    )}
                     <button
                       onClick={handlePayment}
                       disabled={isProcessing}
