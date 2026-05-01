@@ -23,23 +23,20 @@ export async function GET(_req: Request, { params }: { params: Promise<{ address
   })
 }
 
-// PATCH /api/points/wallet/:address — update points by wallet address
+// PATCH /api/points/wallet/:address — set points by wallet address
+// body: { points: number }
 export async function PATCH(request: Request, { params }: { params: Promise<{ address: string }> }) {
   const { address } = await params
 
-  let body: { points?: number; type?: 'add' | 'subtract' | 'set'; note?: string }
+  let body: { points?: number }
   try {
     body = await request.json()
   } catch {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  if (body.points === undefined || !body.type) {
-    return Response.json({ error: 'points and type are required' }, { status: 400 })
-  }
-
-  if (!['add', 'subtract', 'set'].includes(body.type)) {
-    return Response.json({ error: 'type must be add, subtract, or set' }, { status: 400 })
+  if (body.points === undefined) {
+    return Response.json({ error: 'points is required' }, { status: 400 })
   }
 
   if (body.points < 0) {
@@ -58,36 +55,19 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ad
     return Response.json({ error: 'Wallet not found' }, { status: 404 })
   }
 
-  let newTotal: number
-  if (body.type === 'add') {
-    newTotal = existing.total_points + body.points
-  } else if (body.type === 'subtract') {
-    newTotal = Math.max(0, existing.total_points - body.points)
-  } else {
-    newTotal = body.points
-  }
-
   const { error: updateError } = await supabase
     .from('user_points')
-    .update({ total_points: newTotal, updated_at: new Date().toISOString() })
+    .update({ total_points: body.points, updated_at: new Date().toISOString() })
     .eq('wallet_address', address)
 
   if (updateError) {
     return Response.json({ error: 'Failed to update points' }, { status: 500 })
   }
 
-  // Record the transaction
-  await supabase.from('point_transactions').insert({
-    user_id: existing.user_id,
-    points: body.type === 'subtract' ? -body.points : body.points,
-    type: body.type === 'subtract' ? 'redeemed' : 'earned',
-    note: body.note ?? `Points ${body.type} via wallet`,
-  })
-
   return Response.json({
     wallet_address: address,
     previous_points: existing.total_points,
-    total_points: newTotal,
-    change: newTotal - existing.total_points,
+    total_points: body.points,
+    change: body.points - existing.total_points,
   })
 }
