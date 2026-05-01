@@ -37,8 +37,8 @@ export function PointsProvider({ children }: { children: React.ReactNode }) {
       const transactions: Transaction[] = data.history.map((tx) => ({
         id: tx.id,
         userId: user.id,
-        merchantId: 'blacksinyo',
-        merchantName: 'Blacksinyo Coffee',
+        merchantId: 'whitesinyo',
+        merchantName: 'Whitesinyo Coffee',
         amount: 0,
         pointsEarned: tx.points,
         timestamp: new Date(tx.created_at),

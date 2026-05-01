@@ -17,7 +17,7 @@ export default function PointsHistoryPage() {
     <div className="min-h-screen bg-white">
       <section className="border-b border-black/8 py-10 px-8 md:px-16">
         <div className="max-w-350 mx-auto">
-          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Blacksinyo Coffee</p>
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Whitesinyo Coffee</p>
           <h1 className="text-3xl font-black uppercase tracking-tight">Points History</h1>
         </div>
       </section>
@@ -80,7 +80,7 @@ export default function PointsHistoryPage() {
                             <span className="text-white text-[10px] font-black">BS</span>
                           </div>
                           <div>
-                            <p className="text-sm font-semibold">Blacksinyo Coffee</p>
+                            <p className="text-sm font-semibold">Whitesinyo Coffee</p>
                             <p className="text-[11px] text-black/35 uppercase tracking-wider">
                               {new Date(transaction.timestamp).toLocaleDateString('id-ID', {
                                 weekday: 'long',

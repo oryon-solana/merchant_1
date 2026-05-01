@@ -56,7 +56,7 @@ export default function RegisterPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-black relative flex-col justify-between p-16 pt-28 overflow-hidden">
         <motion.img
           src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1920&q=80"
-          alt="Blacksinyo Coffee"
+          alt="Whitesinyo Coffee"
           className="absolute inset-0 w-full h-full object-cover opacity-25"
           initial={{ scale: 1.05 }}
           animate={{ scale: 1 }}
@@ -65,7 +65,7 @@ export default function RegisterPage() {
         />
         <div className="relative z-10">
           <Link href="/" className="text-white text-sm font-black uppercase tracking-widest">
-            Blacksinyo
+            Whitesinyo
           </Link>
         </div>
         <motion.div
@@ -93,7 +93,7 @@ export default function RegisterPage() {
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
             <Link href="/" className="text-black text-sm font-black uppercase tracking-widest">
-              Blacksinyo
+              Whitesinyo
             </Link>
           </div>
 

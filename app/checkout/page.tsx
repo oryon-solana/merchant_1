@@ -8,23 +8,14 @@ import { useCart } from '@/lib/contexts/CartContext'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { usePoints } from '@/lib/contexts/PointsContext'
 import { apiFetch } from '@/lib/api-client'
-import { Input } from '@/components/ui/input'
 import { Lock, ArrowLeft, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { cartItems, getCartTotal, getCartPointsEstimate, clearCart } = useCart()
-  const { user, isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth()
   const { refreshPoints } = usePoints()
-  const [step, setStep] = useState<'form' | 'payment' | 'success'>('form')
-  const [formData, setFormData] = useState({
-    fullName: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    address: '',
-    city: '',
-    postalCode: '',
-  })
+  const [step, setStep] = useState<'payment' | 'success'>('payment')
   const [paymentMethod, setPaymentMethod] = useState('e-wallet')
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderId, setOrderId] = useState('')
@@ -68,13 +59,6 @@ export default function CheckoutPage() {
     )
   }
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (formData.address && formData.city && formData.postalCode) {
-      setStep('payment')
-    }
-  }
-
   const handlePayment = async () => {
     setIsProcessing(true)
     setCheckoutError('')
@@ -111,14 +95,14 @@ export default function CheckoutPage() {
         <div className="max-w-350 mx-auto">
           {step !== 'success' && (
             <button
-              onClick={() => step === 'payment' ? setStep('form') : router.back()}
+              onClick={() => router.back()}
               className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/40 hover:text-black mb-5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              {step === 'payment' ? 'Back to Details' : 'Back'}
+              Back
             </button>
           )}
-          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Blacksinyo Coffee</p>
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Whitesinyo Coffee</p>
           <h1 className="text-3xl font-black uppercase tracking-tight">
             {step === 'success' ? 'Order Confirmed' : 'Checkout'}
           </h1>
@@ -174,132 +158,47 @@ export default function CheckoutPage() {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-              {/* Left: form */}
+              {/* Left: payment method */}
               <div className="lg:col-span-2">
-                {step === 'form' ? (
-                  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                    <h2 className="text-[10px] uppercase tracking-widest text-black/40 mb-6">Delivery Details</h2>
-                    <form onSubmit={handleFormSubmit} className="space-y-5">
-                      <div>
-                        <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Full Name</label>
-                        <Input
-                          type="text"
-                          value={formData.fullName}
-                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                          required
-                          placeholder="Your full name"
-                          className="border-black/15 focus:border-black bg-transparent"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Email</label>
-                          <Input
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            required
-                            placeholder="email@example.com"
-                            className="border-black/15 focus:border-black bg-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Phone</label>
-                          <Input
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            required
-                            placeholder="08xxxxxxxxxx"
-                            className="border-black/15 focus:border-black bg-transparent"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Address</label>
-                        <textarea
-                          value={formData.address}
-                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                          required
-                          placeholder="Street, number, unit..."
-                          rows={3}
-                          className="w-full px-3 py-2.5 border border-black/15 focus:border-black focus:outline-none text-sm bg-transparent resize-none"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">City</label>
-                          <Input
-                            type="text"
-                            value={formData.city}
-                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                            required
-                            placeholder="City"
-                            className="border-black/15 focus:border-black bg-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] uppercase tracking-widest text-black/50 mb-2">Postal Code</label>
-                          <Input
-                            type="text"
-                            value={formData.postalCode}
-                            onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                            required
-                            placeholder="00000"
-                            className="border-black/15 focus:border-black bg-transparent"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        type="submit"
-                        className="w-full bg-black text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors flex items-center justify-center gap-2"
+                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+                  <h2 className="text-[10px] uppercase tracking-widest text-black/40 mb-6">Payment Method</h2>
+                  <div className="space-y-3 mb-8">
+                    {PAYMENT_METHODS.map((method) => (
+                      <label
+                        key={method.id}
+                        className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${
+                          paymentMethod === method.id
+                            ? 'border-black bg-black/3'
+                            : 'border-black/12 hover:border-black/30'
+                        }`}
                       >
-                        Continue to Payment <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </form>
-                  </motion.div>
-
-                ) : (
-                  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                    <h2 className="text-[10px] uppercase tracking-widest text-black/40 mb-6">Payment Method</h2>
-                    <div className="space-y-3 mb-8">
-                      {PAYMENT_METHODS.map((method) => (
-                        <label
-                          key={method.id}
-                          className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${
-                            paymentMethod === method.id
-                              ? 'border-black bg-black/3'
-                              : 'border-black/12 hover:border-black/30'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="payment"
-                            value={method.id}
-                            checked={paymentMethod === method.id}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="w-4 h-4"
-                          />
-                          <div>
-                            <p className="text-sm font-semibold uppercase tracking-wider">{method.label}</p>
-                            <p className="text-xs text-black/40">{method.desc}</p>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                    {checkoutError && (
-                      <p className="text-red-600 text-sm">{checkoutError}</p>
-                    )}
-                    <button
-                      onClick={handlePayment}
-                      disabled={isProcessing}
-                      className="w-full bg-[#0099FF] text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {isProcessing ? 'Processing...' : 'Pay Now'}
-                      {!isProcessing && <ArrowRight className="w-3.5 h-3.5" />}
-                    </button>
-                  </motion.div>
-                )}
+                        <input
+                          type="radio"
+                          name="payment"
+                          value={method.id}
+                          checked={paymentMethod === method.id}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="w-4 h-4"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold uppercase tracking-wider">{method.label}</p>
+                          <p className="text-xs text-black/40">{method.desc}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  {checkoutError && (
+                    <p className="text-red-600 text-sm mb-4">{checkoutError}</p>
+                  )}
+                  <button
+                    onClick={handlePayment}
+                    disabled={isProcessing}
+                    className="w-full bg-[#0099FF] text-white py-3.5 text-[11px] uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isProcessing ? 'Processing...' : 'Pay Now'}
+                    {!isProcessing && <ArrowRight className="w-3.5 h-3.5" />}
+                  </button>
+                </motion.div>
               </div>
 
               {/* Right: summary */}

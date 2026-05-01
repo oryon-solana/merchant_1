@@ -358,7 +358,7 @@ export default function Home() {
         <div className="max-w-[1400px] mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2 md:col-span-1">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-5">Blacksinyo</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest mb-5">Whitesinyo</h3>
               <p className="text-white/35 text-xs leading-relaxed max-w-xs">
                 Specialty coffee experience with a minimalist soul. Every cup crafted with intention.
               </p>
@@ -409,7 +409,7 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between pt-8 border-t border-white/10">
             <p className="text-white/25 text-[10px] uppercase tracking-widest">
-              © {new Date().getFullYear()} Blacksinyo Coffee. All rights reserved.
+              © {new Date().getFullYear()} Whitesinyo Coffee. All rights reserved.
             </p>
             <p className="text-white/25 text-[10px] uppercase tracking-widest mt-4 md:mt-0">
               Jakarta · IDR

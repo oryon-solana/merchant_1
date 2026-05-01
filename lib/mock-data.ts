@@ -19,9 +19,9 @@ export const MOCK_USERS: User[] = [
 
 export const MOCK_MERCHANTS: Merchant[] = [
   {
-    id: 'blacksinyo',
-    slug: 'blacksinyo',
-    name: 'Blacksinyo Coffee',
+    id: 'whitesinyo',
+    slug: 'whitesinyo',
+    name: 'Whitesinyo Coffee',
     description: 'Specialty coffee experience with a minimalist soul. Every cup crafted with intention, every sip rewarded.',
     logo: 'https://placehold.co/120x120/000000/FFFFFF?text=BS',
     heroImage: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1920&q=80',
@@ -34,7 +34,7 @@ export const MOCK_MERCHANTS: Merchant[] = [
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: '11111111-0000-0000-0000-000000000001',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Espresso',
     description: 'Pure, concentrated coffee shot with rich crema and bold flavor profile',
     price: 25000,
@@ -45,7 +45,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000002',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Americano',
     description: 'Espresso diluted with hot water for a smooth, full-bodied black coffee',
     price: 30000,
@@ -56,7 +56,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000003',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Cappuccino',
     description: 'Classic Italian coffee with equal parts espresso, steamed milk and velvety microfoam',
     price: 35000,
@@ -67,7 +67,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000004',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Caffe Latte',
     description: 'Smooth espresso with velvety steamed milk and a delicate layer of foam',
     price: 38000,
@@ -78,7 +78,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000005',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Caramel Macchiato',
     description: 'Vanilla-infused milk marked with espresso and a generous drizzle of caramel',
     price: 42000,
@@ -89,7 +89,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000006',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Cold Brew',
     description: 'Slow-steeped for 18 hours — smooth, naturally sweet, served over ice',
     price: 40000,
@@ -100,7 +100,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000007',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Matcha Latte',
     description: 'Premium Japanese matcha whisked with steamed milk for a creamy, earthy delight',
     price: 45000,
@@ -111,7 +111,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000008',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Iced Chocolate',
     description: 'Rich Belgian chocolate blended with cold milk for ultimate indulgence',
     price: 38000,
@@ -122,7 +122,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000009',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Butter Croissant',
     description: 'Flaky, golden croissant made with French butter and laminated to perfection',
     price: 32000,
@@ -133,7 +133,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000010',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Banana Bread',
     description: 'Moist, dense banana bread with toasted walnuts, served warm',
     price: 28000,
@@ -144,7 +144,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000011',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Cheesecake',
     description: 'Creamy New York-style cheesecake on a buttery graham cracker crust',
     price: 45000,
@@ -155,7 +155,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
   {
     id: '11111111-0000-0000-0000-000000000012',
-    merchantId: 'blacksinyo',
+    merchantId: 'whitesinyo',
     name: 'Tiramisu',
     description: 'Classic Italian dessert with espresso-soaked ladyfingers and mascarpone cream',
     price: 48000,
@@ -176,8 +176,8 @@ export const MOCK_TRANSACTIONS = [
   {
     id: 'trans-1',
     userId: '1',
-    merchantId: 'blacksinyo',
-    merchantName: 'Blacksinyo Coffee',
+    merchantId: 'whitesinyo',
+    merchantName: 'Whitesinyo Coffee',
     amount: 77000,
     pointsEarned: 770,
     timestamp: new Date('2024-04-20'),
@@ -189,8 +189,8 @@ export const MOCK_TRANSACTIONS = [
   {
     id: 'trans-2',
     userId: '1',
-    merchantId: 'blacksinyo',
-    merchantName: 'Blacksinyo Coffee',
+    merchantId: 'whitesinyo',
+    merchantName: 'Whitesinyo Coffee',
     amount: 115000,
     pointsEarned: 1150,
     timestamp: new Date('2024-04-18'),
@@ -202,8 +202,8 @@ export const MOCK_TRANSACTIONS = [
   {
     id: 'trans-3',
     userId: '1',
-    merchantId: 'blacksinyo',
-    merchantName: 'Blacksinyo Coffee',
+    merchantId: 'whitesinyo',
+    merchantName: 'Whitesinyo Coffee',
     amount: 124000,
     pointsEarned: 1240,
     timestamp: new Date('2024-04-15'),

@@ -61,7 +61,7 @@ export default function ShopPage() {
           >
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-black/40 text-[10px] uppercase tracking-widest mb-1">Blacksinyo Coffee</p>
+                <p className="text-black/40 text-[10px] uppercase tracking-widest mb-1">Whitesinyo Coffee</p>
                 <h1 className="text-2xl font-black uppercase tracking-tight">Our Menu</h1>
               </div>
               <span className="text-[11px] text-black/40 uppercase tracking-widest pb-0.5">
@@ -149,7 +149,6 @@ export default function ShopPage() {
               className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
             >
               {filteredProducts.map((product, idx) => {
-                const pts = Math.floor(product.price * MERCHANT.pointsMultiplier)
                 return (
                   <motion.div
                     key={product.id}
@@ -165,9 +164,6 @@ export default function ShopPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
                       />
-                      <div className="absolute top-3 right-3 bg-[#0099FF] text-white text-[10px] px-2 py-0.5 uppercase tracking-wider">
-                        +{pts} pts
-                      </div>
                       {product.sold && product.sold > 2000 && (
                         <div className="absolute bottom-3 left-3 bg-black/70 text-white text-[10px] px-2 py-0.5 uppercase tracking-wider">
                           Popular

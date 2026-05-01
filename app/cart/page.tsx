@@ -61,7 +61,7 @@ export default function CartPage() {
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back
           </button>
-          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Blacksinyo Coffee</p>
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Whitesinyo Coffee</p>
           <h1 className="text-3xl font-black uppercase tracking-tight">Your Order</h1>
         </div>
       </section>
