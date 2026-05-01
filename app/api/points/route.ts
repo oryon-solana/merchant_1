@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const [pointsResult, historyResult] = await Promise.all([
     supabase
       .from('user_points')
-      .select('total_points, updated_at')
+      .select('total_points, updated_at, wallet_address')
       .eq('user_id', user.id)
       .single(),
     supabase
@@ -24,6 +24,7 @@ export async function GET(request: Request) {
   return Response.json({
     total_points: pointsResult.data?.total_points ?? 0,
     last_updated: pointsResult.data?.updated_at ?? null,
+    wallet_address: pointsResult.data?.wallet_address ?? null,
     history: historyResult.data ?? [],
   })
 }

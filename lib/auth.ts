@@ -1,11 +1,22 @@
-import { createSupabaseAdminClient, getBearerToken } from '@/lib/supabase'
-import type { User } from '@supabase/supabase-js'
+import { getBearerToken } from '@/lib/supabase'
+import { verifyToken } from '@/lib/jwt'
 
-export async function getAuthUser(request: Request): Promise<User | null> {
+export interface AuthUser {
+  id: string
+  email: string
+  name: string
+}
+
+export async function getAuthUser(request: Request): Promise<AuthUser | null> {
   const token = getBearerToken(request)
   if (!token) return null
-  const { data: { user } } = await createSupabaseAdminClient().auth.getUser(token)
-  return user
+  try {
+    const payload = await verifyToken(token)
+    if (payload.type !== 'access') return null
+    return { id: payload.sub, email: payload.email ?? '', name: payload.name ?? '' }
+  } catch {
+    return null
+  }
 }
 
 export function unauthorized() {

@@ -8,6 +8,7 @@ import { useAuth } from './AuthContext'
 interface PointsContextType {
   points: PointsBalance | null
   isLoading: boolean
+  walletAddress: string | null
   refreshPoints: () => Promise<void>
   getTransactions: () => Transaction[]
   getTotalPoints: () => number
@@ -18,6 +19,7 @@ const PointsContext = createContext<PointsContextType | undefined>(undefined)
 export function PointsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
   const [points, setPoints] = useState<PointsBalance | null>(null)
+  const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const refreshPoints = useCallback(async () => {
@@ -28,6 +30,7 @@ export function PointsProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) return
       const data: {
         total_points: number
+        wallet_address: string | null
         history: { id: string; points: number; type: string; note: string; created_at: string; order_id: string }[]
       } = await res.json()
 
@@ -42,6 +45,7 @@ export function PointsProvider({ children }: { children: React.ReactNode }) {
         items: [],
       }))
 
+      setWalletAddress(data.wallet_address ?? null)
       setPoints({
         totalPoints: data.total_points,
         availablePoints: data.total_points,
@@ -66,6 +70,7 @@ export function PointsProvider({ children }: { children: React.ReactNode }) {
       value={{
         points,
         isLoading,
+        walletAddress,
         refreshPoints,
         getTransactions: () => points?.transactions ?? [],
         getTotalPoints: () => points?.totalPoints ?? 0,

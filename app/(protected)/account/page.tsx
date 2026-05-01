@@ -3,12 +3,14 @@
 import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { usePoints } from '@/lib/contexts/PointsContext'
+import { usePhantomWallet } from '@/lib/hooks/usePhantomWallet'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
 export default function AccountPage() {
   const { user } = useAuth()
-  const { points, getTotalPoints } = usePoints()
+  const { points, getTotalPoints, walletAddress: savedWallet, refreshPoints } = usePoints()
+  const { walletAddress, isConnecting, isPhantomInstalled, error: walletError, connect, disconnect } = usePhantomWallet(savedWallet, refreshPoints)
 
   if (!user) return null
 
@@ -52,6 +54,54 @@ export default function AccountPage() {
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-black/35 mb-1">Phone</p>
                   <p className="font-semibold text-sm">{user.phone}</p>
+                </div>
+
+                <div className="pt-2 border-t border-black/8">
+                  <p className="text-[10px] uppercase tracking-widest text-black/35 mb-3">Solana Wallet</p>
+                  {walletAddress ? (
+                    <div className="space-y-3">
+                      <div className="bg-black/4 px-3 py-2">
+                        <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Connected</p>
+                        <p className="text-xs font-mono text-black/70 break-all">
+                          {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}
+                        </p>
+                      </div>
+                      <button
+                        onClick={disconnect}
+                        className="w-full border border-black/20 py-2.5 text-[10px] uppercase tracking-widest hover:border-black transition-colors text-black/50 hover:text-black"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <button
+                        onClick={connect}
+                        disabled={isConnecting || !isPhantomInstalled}
+                        className="w-full bg-black text-white py-2.5 text-[10px] uppercase tracking-widest hover:bg-[#0099FF] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                      >
+                        {isConnecting ? 'Connecting...' : (
+                          <>
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 128 128" fill="none">
+                              <rect width="128" height="128" rx="26" fill="#AB9FF2"/>
+                              <path d="M110.584 64.9142H99.142C99.142 41.7651 80.173 23 56.7906 23C33.6716 23 14.8753 41.4072 14.5754 64.2519C14.2661 87.7778 33.5046 107 57.0196 107H60.1228C81.6093 107 110.584 89.0164 110.584 64.9142Z" fill="white"/>
+                            </svg>
+                            Connect Phantom
+                          </>
+                        )}
+                      </button>
+                      {!isPhantomInstalled && (
+                        <p className="text-[10px] text-black/40 text-center">
+                          <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="underline hover:text-black">
+                            Install Phantom
+                          </a>{' '}to connect
+                        </p>
+                      )}
+                      {walletError && (
+                        <p className="text-[10px] text-red-500">{walletError}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
