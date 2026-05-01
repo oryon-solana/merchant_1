@@ -218,7 +218,6 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {featuredProducts.map((product, idx) => {
-              const pts = Math.floor(product.price * 0.1)
               return (
                 <motion.div
                   key={product.id}
@@ -239,9 +238,7 @@ export default function Home() {
                         onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/8 transition-colors duration-300" />
-                      <div className="absolute top-3 right-3 bg-[#0099FF] text-white text-[10px] px-2 py-0.5 uppercase tracking-wider">
-                        +{pts} pts
-                      </div>
+
                     </div>
                     <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">{product.category}</p>
                     <p className="text-sm font-semibold leading-tight mb-1">{product.name}</p>

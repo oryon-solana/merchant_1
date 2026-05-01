@@ -7,6 +7,7 @@ import { PointsProvider } from '@/lib/contexts/PointsContext'
 import { CartProvider } from '@/lib/contexts/CartContext'
 import Navbar from '@/components/Navbar'
 import LenisProvider from '@/components/LenisProvider'
+import AppLoader from '@/components/AppLoader'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -46,10 +47,12 @@ export default function RootLayout({
           <PointsProvider>
             <CartProvider>
               <LenisProvider>
-                <Navbar />
-                <main className="pt-20">
-                  {children}
-                </main>
+                <AppLoader>
+                  <Navbar />
+                  <main className="pt-20">
+                    {children}
+                  </main>
+                </AppLoader>
               </LenisProvider>
             </CartProvider>
           </PointsProvider>
