@@ -1,4 +1,6 @@
-import { createSupabaseClient } from '@/lib/supabase'
+import { compare } from 'bcryptjs'
+import { createSupabaseAdminClient } from '@/lib/supabase'
+import { signAccessToken, signRefreshToken } from '@/lib/jwt'
 
 export async function POST(request: Request) {
   let body: { email?: string; password?: string }
@@ -15,24 +17,33 @@ export async function POST(request: Request) {
     return Response.json({ error: 'email and password are required' }, { status: 400 })
   }
 
-  const supabase = createSupabaseClient()
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  const supabase = createSupabaseAdminClient()
 
-  if (error) {
-    return Response.json({ error: error.message }, { status: 401 })
+  const { data: user } = await supabase
+    .from('custom_users')
+    .select('id, email, name, password_hash')
+    .eq('email', email)
+    .single()
+
+  if (!user) {
+    return Response.json({ error: 'Invalid email or password' }, { status: 401 })
   }
 
-  const { session, user } = data
+  const valid = await compare(password, user.password_hash)
+  if (!valid) {
+    return Response.json({ error: 'Invalid email or password' }, { status: 401 })
+  }
+
+  const [access_token, refresh_token] = await Promise.all([
+    signAccessToken({ sub: user.id, email: user.email, name: user.name ?? '' }),
+    signRefreshToken(user.id),
+  ])
 
   return Response.json({
-    access_token: session.access_token,
-    refresh_token: session.refresh_token,
+    access_token,
+    refresh_token,
     token_type: 'Bearer',
-    expires_in: session.expires_in,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.user_metadata?.name,
-    },
+    expires_in: 3600,
+    user: { id: user.id, email: user.email, name: user.name },
   })
 }
