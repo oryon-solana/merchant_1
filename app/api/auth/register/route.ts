@@ -1,4 +1,5 @@
-import { createSupabaseClient } from '@/lib/supabase'
+import { hash } from 'bcryptjs'
+import { createSupabaseAdminClient } from '@/lib/supabase'
 
 export async function POST(request: Request) {
   let body: { email?: string; password?: string; name?: string }
@@ -19,25 +20,34 @@ export async function POST(request: Request) {
     return Response.json({ error: 'password must be at least 8 characters' }, { status: 400 })
   }
 
-  const supabase = createSupabaseClient()
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { name } },
-  })
+  const supabase = createSupabaseAdminClient()
 
-  if (error) {
-    return Response.json({ error: error.message }, { status: 400 })
+  const { data: existing } = await supabase
+    .from('custom_users')
+    .select('id')
+    .eq('email', email)
+    .single()
+
+  if (existing) {
+    return Response.json({ error: 'Email already in use' }, { status: 400 })
+  }
+
+  const password_hash = await hash(password, 10)
+
+  const { data, error } = await supabase
+    .from('custom_users')
+    .insert({ email, name: name ?? null, password_hash })
+    .select('id, email, name')
+    .single()
+
+  if (error || !data) {
+    return Response.json({ error: 'Registration failed' }, { status: 500 })
   }
 
   return Response.json(
     {
       message: 'Registration successful.',
-      user: {
-        id: data.user?.id,
-        email: data.user?.email,
-        name: data.user?.user_metadata?.name,
-      },
+      user: { id: data.id, email: data.email, name: data.name },
     },
     { status: 201 }
   )

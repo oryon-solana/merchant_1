@@ -1,4 +1,5 @@
-import { createSupabaseAdminClient, getBearerToken } from '@/lib/supabase'
+import { getBearerToken } from '@/lib/supabase'
+import { verifyToken } from '@/lib/jwt'
 
 export async function POST(request: Request) {
   const token = getBearerToken(request)
@@ -7,19 +8,12 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Missing or invalid Authorization header' }, { status: 401 })
   }
 
-  const admin = createSupabaseAdminClient()
-
-  const { data: { user }, error: userError } = await admin.auth.getUser(token)
-
-  if (userError || !user) {
+  try {
+    await verifyToken(token)
+  } catch {
     return Response.json({ error: 'Invalid or expired token' }, { status: 401 })
   }
 
-  const { error } = await admin.auth.admin.signOut(user.id, 'global')
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 })
-  }
-
+  // Tokens are stateless JWTs — the client clears them on their side
   return Response.json({ message: 'Logged out successfully' })
 }
