@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from '@/lib/supabase'
 import { getAuthUser, unauthorized } from '@/lib/auth'
+import { earnPointsOnChain } from '@/lib/solana'
 
 const POINTS_PER_IDR = 8000 // 1 point per 8,000 IDR spent
 
@@ -95,7 +96,7 @@ export async function POST(request: Request) {
   // 7. upsert user_points balance
   const { data: currentPoints } = await supabase
     .from('user_points')
-    .select('total_points')
+    .select('total_points, wallet_address')
     .eq('user_id', user.id)
     .single()
 
@@ -119,6 +120,18 @@ export async function POST(request: Request) {
   // 9. clear cart
   await supabase.from('cart_items').delete().eq('user_id', user.id)
 
+  // 10. mint points on-chain (non-blocking — DB is the source of truth)
+  let chainTx: string | null = null
+  let chainSynced = false
+  if (pointsEarned > 0 && currentPoints?.wallet_address) {
+    try {
+      chainTx = await earnPointsOnChain(currentPoints.wallet_address, total)
+      chainSynced = true
+    } catch (err) {
+      console.error('[solana] earn_points failed:', err)
+    }
+  }
+
   return Response.json(
     {
       order: {
@@ -139,6 +152,10 @@ export async function POST(request: Request) {
           pointsEarned > 0
             ? `You earned ${pointsEarned} point${pointsEarned > 1 ? 's' : ''}!`
             : `Spend at least Rp${POINTS_PER_IDR.toLocaleString('id-ID')} to earn points.`,
+      },
+      chain: {
+        synced: chainSynced,
+        tx: chainTx,
       },
     },
     { status: 201 }
