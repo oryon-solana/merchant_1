@@ -4,6 +4,8 @@ import type { NextRequest } from "next/server";
 const allowedOrigins = [
   "https://oryon-web.vercel.app",
   "http://localhost:3000",
+  "http://localhost:8000",
+  "http://localhost:8080",
 ];
 
 const corsHeaders = {
