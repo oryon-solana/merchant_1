@@ -68,7 +68,7 @@ export default function Navbar() {
               href="/"
               className={`text-sm font-black uppercase tracking-widest transition-colors ${textColor}`}
             >
-              Blacksinyo
+              Whitesinyo
             </Link>
 
             {/* Desktop nav links */}

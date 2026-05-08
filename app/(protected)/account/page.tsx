@@ -21,7 +21,7 @@ export default function AccountPage() {
     <div className="min-h-screen bg-white">
       <section className="border-b border-black/8 py-10 px-8 md:px-16">
         <div className="max-w-350 mx-auto">
-          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Blacksinyo Coffee</p>
+          <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Whitesinyo Coffee</p>
           <h1 className="text-3xl font-black uppercase tracking-tight">My Account</h1>
         </div>
       </section>

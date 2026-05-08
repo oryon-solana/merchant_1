@@ -218,7 +218,6 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {featuredProducts.map((product, idx) => {
-              const pts = Math.floor(product.price * 0.1)
               return (
                 <motion.div
                   key={product.id}
@@ -239,9 +238,7 @@ export default function Home() {
                         onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/8 transition-colors duration-300" />
-                      <div className="absolute top-3 right-3 bg-[#0099FF] text-white text-[10px] px-2 py-0.5 uppercase tracking-wider">
-                        +{pts} pts
-                      </div>
+
                     </div>
                     <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">{product.category}</p>
                     <p className="text-sm font-semibold leading-tight mb-1">{product.name}</p>
@@ -358,7 +355,7 @@ export default function Home() {
         <div className="max-w-[1400px] mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2 md:col-span-1">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-5">Blacksinyo</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest mb-5">Whitesinyo</h3>
               <p className="text-white/35 text-xs leading-relaxed max-w-xs">
                 Specialty coffee experience with a minimalist soul. Every cup crafted with intention.
               </p>
@@ -409,7 +406,7 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between pt-8 border-t border-white/10">
             <p className="text-white/25 text-[10px] uppercase tracking-widest">
-              © {new Date().getFullYear()} Blacksinyo Coffee. All rights reserved.
+              © {new Date().getFullYear()} Whitesinyo Coffee. All rights reserved.
             </p>
             <p className="text-white/25 text-[10px] uppercase tracking-widest mt-4 md:mt-0">
               Jakarta · IDR

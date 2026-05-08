@@ -17,10 +17,10 @@ interface PointsContextType {
 const PointsContext = createContext<PointsContextType | undefined>(undefined)
 
 export function PointsProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
+  const { user, isLoading: authLoading } = useAuth()
   const [points, setPoints] = useState<PointsBalance | null>(null)
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const refreshPoints = useCallback(async () => {
     if (!user) return
@@ -37,8 +37,8 @@ export function PointsProvider({ children }: { children: React.ReactNode }) {
       const transactions: Transaction[] = data.history.map((tx) => ({
         id: tx.id,
         userId: user.id,
-        merchantId: 'blacksinyo',
-        merchantName: 'Blacksinyo Coffee',
+        merchantId: 'whitesinyo',
+        merchantName: 'Whitesinyo Coffee',
         amount: 0,
         pointsEarned: tx.points,
         timestamp: new Date(tx.created_at),
@@ -58,12 +58,14 @@ export function PointsProvider({ children }: { children: React.ReactNode }) {
   }, [user])
 
   useEffect(() => {
+    if (authLoading) return
     if (user) {
       refreshPoints()
     } else {
       setPoints(null)
+      setIsLoading(false)
     }
-  }, [user, refreshPoints])
+  }, [user, authLoading, refreshPoints])
 
   return (
     <PointsContext.Provider
